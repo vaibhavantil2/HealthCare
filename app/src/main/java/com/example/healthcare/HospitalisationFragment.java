@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class HospitalisationFragment extends Fragment {
@@ -47,6 +48,7 @@ public class HospitalisationFragment extends Fragment {
                     Hospitalisation hospitalisation = data.getValue(Hospitalisation.class);
                     if(hospitalisation.getEmailPatient().equals(emailPatient)) {
                         myHospitalisations.add(hospitalisation);
+                        Collections.sort(myHospitalisations);
                         if (getActivity()!=null){
                             adapter = new HospitalisationAdapter(getActivity(), myHospitalisations);
                             hospitalisations.setAdapter(adapter);

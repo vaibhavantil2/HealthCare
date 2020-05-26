@@ -1,7 +1,12 @@
 package com.example.healthcare.DoctorUI;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -9,9 +14,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
+import com.example.healthcare.AppointmentsActivity;
 import com.example.healthcare.MainActivity;
+import com.example.healthcare.MenuActivity;
 import com.example.healthcare.R;
+import com.example.healthcare.models.Appointment;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,6 +33,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -33,18 +45,62 @@ public class DoctorMenuActivity extends AppCompatActivity {
     DatabaseReference databaseReference;
     FirebaseUser user;
     SharedPreferences sp;
-    String uid;
+    String uid, todaysDate;
+    int numberOfAppointments;
+    String[] numbers = {"one","two","three","four","five","six","seven","eight","nine","ten"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_menu);
+        numberOfAppointments = 0;
+        Calendar c = Calendar.getInstance();
+        todaysDate = DateFormat.getDateInstance(DateFormat.SHORT).format(c.getTime());
         user = FirebaseAuth.getInstance().getCurrentUser();
         sp = getSharedPreferences("login",MODE_PRIVATE);
         fullName = findViewById(R.id.fullName);
         speciality = findViewById(R.id.speciality);
         profilePicture = findViewById(R.id.profile_image);
         uid = user.getUid();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Appointments");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot data : dataSnapshot.getChildren())
+                {
+                    Appointment appointment = data.getValue(Appointment.class);
+                    if(appointment.getEmailPatient().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail()) &&
+                            appointment.getStatus().equals("Accepted") &&
+                            appointment.getDate().equals(todaysDate)
+                    )
+                        numberOfAppointments++;
+                }
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(DoctorMenuActivity.this)
+                        .setSmallIcon(R.drawable.ic_heart_beats)
+                        .setContentTitle("Daily appointments")
+                        .setContentText("You have "+numbers[numberOfAppointments-1]+" appointment(s) today")
+                        .setAutoCancel(true)
+                        .setColor(Color.parseColor("#33AEB6"))
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH);
+                Intent intent = new Intent(DoctorMenuActivity.this, AppointmentsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                PendingIntent pendingIntent = PendingIntent.getActivity(DoctorMenuActivity.this,0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                builder.setContentIntent(pendingIntent);
+
+                NotificationManager notificationManager = (NotificationManager)getSystemService(
+                        Context.NOTIFICATION_SERVICE
+                );
+                notificationManager.notify(0, builder.build());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         databaseReference = FirebaseDatabase.getInstance().getReference("Doctors");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

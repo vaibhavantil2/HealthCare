@@ -44,6 +44,7 @@ public class MenuActivity extends AppCompatActivity {
     String uid;
     String patientFullName, patientCin, todaysDate;
     int numberOfAppointments;
+    String[] numbers = {"one","two","three","four","five","six","seven","eight","nine","ten"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +77,7 @@ public class MenuActivity extends AppCompatActivity {
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(MenuActivity.this)
                         .setSmallIcon(R.drawable.ic_heart_beats)
                         .setContentTitle("Daily appointments")
-                        .setContentText("You have "+numberOfAppointments+" appointments today")
+                        .setContentText("You have "+numbers[numberOfAppointments-1]+" appointment(s) today")
                         .setAutoCancel(true)
                         .setColor(Color.parseColor("#33AEB6"))
                         .setDefaults(Notification.DEFAULT_ALL)
