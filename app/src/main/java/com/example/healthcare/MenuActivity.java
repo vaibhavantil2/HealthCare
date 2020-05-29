@@ -45,7 +45,13 @@ public class MenuActivity extends AppCompatActivity {
     NotificationCompat.Builder builder;
     String patientFullName, patientCin, todaysDate;
     int numberOfAppointments;
+    static int token = 0;
     String[] numbers = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"};
+
+    public static void setToken(int number)
+    {
+        token = number;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,16 +112,18 @@ public class MenuActivity extends AppCompatActivity {
                             .setPriority(NotificationCompat.PRIORITY_HIGH);
 
                 }
-                Intent intent = new Intent(MenuActivity.this, AppointmentsActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                PendingIntent pendingIntent = PendingIntent.getActivity(MenuActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                if(token == 0) {
+                    Intent intent = new Intent(MenuActivity.this, AppointmentsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(MenuActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                builder.setContentIntent(pendingIntent);
+                    builder.setContentIntent(pendingIntent);
 
-                NotificationManager notificationManager = (NotificationManager) getSystemService(
-                        Context.NOTIFICATION_SERVICE
-                );
-                notificationManager.notify(0, builder.build());
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(
+                            Context.NOTIFICATION_SERVICE
+                    );
+                    notificationManager.notify(0, builder.build());
+                }
             }
 
             @Override

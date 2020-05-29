@@ -118,6 +118,7 @@ public class PatientProfileInformations extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(PatientProfileInformations.this, MenuActivity.class);
+        MenuActivity.setToken(1);
         startActivity(intent);
     }
 }
