@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
                     } else {
                         errorMessage.setVisibility(View.VISIBLE);
+                        pDialog.hide();
                     }
                 }
             });

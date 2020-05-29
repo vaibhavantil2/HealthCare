@@ -42,16 +42,17 @@ public class MenuActivity extends AppCompatActivity {
     DatabaseReference databaseReference;
     FirebaseUser user;
     String uid;
+    NotificationCompat.Builder builder;
     String patientFullName, patientCin, todaysDate;
     int numberOfAppointments;
-    String[] numbers = {"one","two","three","four","five","six","seven","eight","nine","ten"};
+    String[] numbers = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
         numberOfAppointments = 0;
-        sp = getSharedPreferences("login",MODE_PRIVATE);
+        sp = getSharedPreferences("login", MODE_PRIVATE);
         user = FirebaseAuth.getInstance().getCurrentUser();
         fullName = findViewById(R.id.fullName);
         cin = findViewById(R.id.cin);
@@ -65,30 +66,53 @@ public class MenuActivity extends AppCompatActivity {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot data : dataSnapshot.getChildren())
-                {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
                     Appointment appointment = data.getValue(Appointment.class);
-                    if(appointment.getEmailPatient().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail()) &&
+                    if (appointment.getEmailPatient().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail()) &&
                             appointment.getStatus().equals("Accepted") &&
                             appointment.getDate().equals(todaysDate)
                     )
                         numberOfAppointments++;
                 }
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(MenuActivity.this)
-                        .setSmallIcon(R.drawable.ic_heart_beats)
-                        .setContentTitle("Daily appointments")
-                        .setContentText("You have "+numbers[numberOfAppointments-1]+" appointment(s) today")
-                        .setAutoCancel(true)
-                        .setColor(Color.parseColor("#33AEB6"))
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH);
+                if (numberOfAppointments == 1) {
+                    builder = new NotificationCompat.Builder(MenuActivity.this)
+                            .setSmallIcon(R.drawable.ic_heart_beats)
+                            .setContentTitle("Daily appointments")
+                            .setContentText("You have one appointment today")
+                            .setAutoCancel(true)
+                            .setColor(Color.parseColor("#33AEB6"))
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH);
+                }
+                if (numberOfAppointments > 1) {
+                    builder = new NotificationCompat.Builder(MenuActivity.this)
+                            .setSmallIcon(R.drawable.ic_heart_beats)
+                            .setContentTitle("Daily appointments")
+                            .setContentText("You have " + numbers[numberOfAppointments - 1] + " appointments today")
+                            .setAutoCancel(true)
+                            .setColor(Color.parseColor("#33AEB6"))
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH);
+
+                }
+                if (numberOfAppointments == 0) {
+                    builder = new NotificationCompat.Builder(MenuActivity.this)
+                            .setSmallIcon(R.drawable.ic_heart_beats)
+                            .setContentTitle("Daily appointments")
+                            .setContentText("You have no appointments today")
+                            .setAutoCancel(true)
+                            .setColor(Color.parseColor("#33AEB6"))
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH);
+
+                }
                 Intent intent = new Intent(MenuActivity.this, AppointmentsActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                PendingIntent pendingIntent = PendingIntent.getActivity(MenuActivity.this,0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pendingIntent = PendingIntent.getActivity(MenuActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 builder.setContentIntent(pendingIntent);
 
-                NotificationManager notificationManager = (NotificationManager)getSystemService(
+                NotificationManager notificationManager = (NotificationManager) getSystemService(
                         Context.NOTIFICATION_SERVICE
                 );
                 notificationManager.notify(0, builder.build());
@@ -105,7 +129,7 @@ public class MenuActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                patientFullName =  dataSnapshot.child(uid).child("lastName").getValue(String.class) +" "+dataSnapshot.child(uid).child("firstName").getValue(String.class);
+                patientFullName = dataSnapshot.child(uid).child("lastName").getValue(String.class) + " " + dataSnapshot.child(uid).child("firstName").getValue(String.class);
                 patientCin = dataSnapshot.child(uid).child("cin").getValue(String.class);
                 fullName.setText(patientFullName);
                 cin.setText(patientCin);
@@ -132,8 +156,7 @@ public class MenuActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void Appointments(View view)
-    {
+    public void Appointments(View view) {
         Intent intent = new Intent(MenuActivity.this, AppointmentsActivity.class);
         startActivity(intent);
     }
@@ -149,7 +172,7 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     public void logOut(View view) {
-        sp.edit().putBoolean("loggedPatient",false).apply();
+        sp.edit().putBoolean("loggedPatient", false).apply();
         FirebaseAuth.getInstance().signOut();
         finish();
         startActivity(new Intent(MenuActivity.this, MainActivity.class));

@@ -26,10 +26,12 @@ import com.example.healthcare.MyBounceInterpolator;
 import com.example.healthcare.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MyPatientInfoActivity extends AppCompatActivity {
@@ -38,8 +40,7 @@ public class MyPatientInfoActivity extends AppCompatActivity {
     CircleImageView circleImageView;
     TextView fullName, birthDate;
     ProgressBar progressBar;
-    String receivedFullName, receivedEmail, receivedBirthDate, receivedPhoneNumber, receivedCin, receivedMaritalStatus;
-    DatabaseReference databaseReference;
+    String receivedFullName, receivedEmail, receivedBirthDate, receivedPhoneNumber, receivedCin, receivedMaritalStatus, relationshipId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,7 @@ public class MyPatientInfoActivity extends AppCompatActivity {
         receivedPhoneNumber = intent.getStringExtra("phoneNumber");
         receivedCin = intent.getStringExtra("cin");
         receivedMaritalStatus = intent.getStringExtra("maritalStatus");
+        relationshipId = intent.getStringExtra("relationshipId");
 
         fullName.setText(receivedFullName);
         birthDate.setText(receivedBirthDate);
@@ -135,6 +137,26 @@ public class MyPatientInfoActivity extends AppCompatActivity {
         MyPatientConsultationsFragment.setEmailPatient(receivedEmail);
         MyPatientHospitalisationsFragment.setEmailPatient(receivedEmail);
         startActivity(intent);
+
+    }
+
+    public void deletePatient(View view) {
+        new SweetAlertDialog(MyPatientInfoActivity.this, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Patient deletion")
+                .setContentText("You really want to delete "+receivedFullName+" from your list of patients ?")
+                .setConfirmText("Yes, I do !")
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Relationships");
+                        ref.child(relationshipId).removeValue();
+                        MyPatientsActivity.notifyAdapter();
+                        sweetAlertDialog.dismiss();
+                        Intent intent = new Intent(MyPatientInfoActivity.this, MyPatientsActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .show();
 
     }
 }

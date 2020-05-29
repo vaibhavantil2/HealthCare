@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.healthcare.R;
+import com.example.healthcare.models.Doctor;
 import com.example.healthcare.models.Patient;
 import com.example.healthcare.models.Relationship;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,7 +27,13 @@ public class MyPatientsActivity extends AppCompatActivity {
     ListView myPatientsListView;
     List<Patient> Patients;
     List<Patient>  myPatients;
-    MyPatientsAdapter adapter;
+    List<String> myRelationShips;
+    static MyPatientsAdapter adapter;
+
+    public static void notifyAdapter()
+    {
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +42,7 @@ public class MyPatientsActivity extends AppCompatActivity {
         myPatientsListView = findViewById(R.id.myPatients);
         Patients = new ArrayList<>();
         myPatients = new ArrayList<>();
+        myRelationShips = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Patients");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -57,6 +65,7 @@ public class MyPatientsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 myPatients.clear();
+                myRelationShips.clear();
                 for(DataSnapshot data : dataSnapshot.getChildren())
                 {
                     Relationship relationship = data.getValue(Relationship.class);
@@ -65,6 +74,7 @@ public class MyPatientsActivity extends AppCompatActivity {
                         Patient patient = Patients.get(i);
                         if(relationship.getEmailPatient().equals(patient.getEmail()) && relationship.getEmailDoctor().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail()))
                         {
+                            myRelationShips.add(data.getKey());
                             myPatients.add(patient);
                             adapter = new MyPatientsAdapter(MyPatientsActivity.this, myPatients);
                             myPatientsListView.setAdapter(adapter);
@@ -89,9 +99,17 @@ public class MyPatientsActivity extends AppCompatActivity {
                 intent.putExtra("phoneNumber",myPatients.get(position).getPhoneNumber());
                 intent.putExtra("maritalStatus", myPatients.get(position).getMaritalStatus());
                 intent.putExtra("birthDate", myPatients.get(position).getBirthDate());
+                intent.putExtra("relationshipId", myRelationShips.get(position));
                 startActivity(intent);
             }
         });
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(MyPatientsActivity.this, DoctorMenuActivity.class);
+        DoctorMenuActivity.setToken(1);
+        startActivity(intent);
     }
 }

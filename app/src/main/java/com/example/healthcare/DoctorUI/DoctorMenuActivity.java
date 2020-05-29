@@ -16,9 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 
-import com.example.healthcare.AppointmentsActivity;
 import com.example.healthcare.MainActivity;
-import com.example.healthcare.MenuActivity;
 import com.example.healthcare.R;
 import com.example.healthcare.models.Appointment;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,6 +46,13 @@ public class DoctorMenuActivity extends AppCompatActivity {
     String uid, todaysDate;
     int numberOfAppointments;
     String[] numbers = {"one","two","three","four","five","six","seven","eight","nine","ten"};
+    NotificationCompat.Builder builder;
+    static int token = 0;
+
+    public static void setToken(int number)
+    {
+        token = number;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,24 +80,51 @@ public class DoctorMenuActivity extends AppCompatActivity {
                     )
                         numberOfAppointments++;
                 }
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(DoctorMenuActivity.this)
-                        .setSmallIcon(R.drawable.ic_heart_beats)
-                        .setContentTitle("Daily appointments")
-                        .setContentText("You have "+numbers[numberOfAppointments-1]+" appointment(s) today")
-                        .setAutoCancel(true)
-                        .setColor(Color.parseColor("#33AEB6"))
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH);
-                Intent intent = new Intent(DoctorMenuActivity.this, AppointmentsActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                PendingIntent pendingIntent = PendingIntent.getActivity(DoctorMenuActivity.this,0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                if (numberOfAppointments == 1) {
+                    builder = new NotificationCompat.Builder(DoctorMenuActivity.this)
+                            .setSmallIcon(R.drawable.ic_heart_beats)
+                            .setContentTitle("Daily appointments")
+                            .setContentText("You have one appointment today")
+                            .setAutoCancel(true)
+                            .setColor(Color.parseColor("#33AEB6"))
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH);
+                }
+                if (numberOfAppointments > 1) {
+                    builder = new NotificationCompat.Builder(DoctorMenuActivity.this)
+                            .setSmallIcon(R.drawable.ic_heart_beats)
+                            .setContentTitle("Daily appointments")
+                            .setContentText("You have " + numbers[numberOfAppointments - 1] + " appointments today")
+                            .setAutoCancel(true)
+                            .setColor(Color.parseColor("#33AEB6"))
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH);
 
-                builder.setContentIntent(pendingIntent);
+                }
+                if (numberOfAppointments == 0) {
+                    builder = new NotificationCompat.Builder(DoctorMenuActivity.this)
+                            .setSmallIcon(R.drawable.ic_heart_beats)
+                            .setContentTitle("Daily appointments")
+                            .setContentText("You have no appointments today")
+                            .setAutoCancel(true)
+                            .setColor(Color.parseColor("#33AEB6"))
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH);
 
-                NotificationManager notificationManager = (NotificationManager)getSystemService(
-                        Context.NOTIFICATION_SERVICE
-                );
-                notificationManager.notify(0, builder.build());
+                }
+                if(token == 0) {
+                    Intent intent = new Intent(DoctorMenuActivity.this, DoctorAppointments.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(DoctorMenuActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    builder.setContentIntent(pendingIntent);
+
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(
+                            Context.NOTIFICATION_SERVICE
+                    );
+
+                    notificationManager.notify(0, builder.build());
+                }
             }
 
             @Override

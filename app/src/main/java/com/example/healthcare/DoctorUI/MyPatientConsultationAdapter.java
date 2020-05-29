@@ -50,6 +50,7 @@ public class MyPatientConsultationAdapter extends BaseAdapter {
         this.arrayList.addAll(consultationList);
     }
 
+
     @Override
     public int getCount() {
         return consultationList.size();
@@ -75,6 +76,12 @@ public class MyPatientConsultationAdapter extends BaseAdapter {
         final TextView day = convertView.findViewById(R.id.day);
         final ImageView deleteView = convertView.findViewById(R.id.deleteView);
         final ImageView editView = convertView.findViewById(R.id.editView);
+        editView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         deleteView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -169,6 +176,7 @@ public class MyPatientConsultationAdapter extends BaseAdapter {
         });
         return convertView;
     }
+
 
 
 }
