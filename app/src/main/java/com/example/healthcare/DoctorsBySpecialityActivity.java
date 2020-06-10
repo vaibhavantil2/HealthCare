@@ -2,7 +2,10 @@ package com.example.healthcare;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +23,7 @@ import java.util.List;
 
 
 public class DoctorsBySpecialityActivity extends AppCompatActivity {
+    TextView doctorSpeciality;
     ListView myDoctorsBySpecialityListView;
     List<Doctor>  myDoctors;
     ListViewAdapter adapter;
@@ -31,6 +35,8 @@ public class DoctorsBySpecialityActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final String speciality = intent.getStringExtra("speciality");
         myDoctorsBySpecialityListView = findViewById(R.id.myDoctorsBySpeciality);
+        doctorSpeciality = findViewById(R.id.speciality);
+        doctorSpeciality.setText(speciality);
         myDoctors = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Doctors");
         reference.addValueEventListener(new ValueEventListener() {
@@ -53,6 +59,19 @@ public class DoctorsBySpecialityActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+        myDoctorsBySpecialityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(), DisplayDoctorInfo.class);
+                intent.putExtra("fullName",myDoctors.get(position).getFullName());
+                intent.putExtra("email",myDoctors.get(position).getEmail());
+                intent.putExtra("speciality",myDoctors.get(position).getSpeciality());
+                intent.putExtra("phoneNumber",myDoctors.get(position).getPhoneNumber());
+                intent.putExtra("address", myDoctors.get(position).getAddress());
+                intent.putExtra("city", myDoctors.get(position).getCity());
+                startActivity(intent);
             }
         });
     }

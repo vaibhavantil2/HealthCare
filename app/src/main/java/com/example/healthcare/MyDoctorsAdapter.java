@@ -65,7 +65,7 @@ public class MyDoctorsAdapter extends BaseAdapter {
         final Doctor doctor = myDoctorsList.get(position);
         final String emailDoctor = doctor.getEmail();
 
-        doctorFullName.setText(doctor.getFullName());
+        doctorFullName.setText("Dr. "+doctor.getFullName());
         speciality.setText(doctor.getSpeciality());
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
         final StorageReference profileRef = storageReference.child("Profile pictures").child(emailDoctor+".jpg");
