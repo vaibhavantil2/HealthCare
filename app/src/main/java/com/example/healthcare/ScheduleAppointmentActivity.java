@@ -76,7 +76,7 @@ public class ScheduleAppointmentActivity extends AppCompatActivity implements Da
         }
         final String currentDateString = DateFormat.getDateInstance(DateFormat.SHORT).format(c.getTime());
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Appointments");
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 appointments.clear();
