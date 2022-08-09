@@ -22,6 +22,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.amplitude.api.Amplitude;
+import com.amplitude.api.AmplitudeClient;
+import com.amplitude.api.Identify;
+
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,6 +96,10 @@ public class CreateAccount extends AppCompatActivity {
         // Initializing the firstbase object
         fbAuth = FirebaseAuth.getInstance();
     }
+    
+   AmplitudeClient client = Amplitude.getInstance()
+  .initialize(getApplicationContext(), "priv012122312sjs")
+  .enableForegroundTracking(getApplication());
 
     @Override
     protected void onStart() {
@@ -167,6 +175,7 @@ public class CreateAccount extends AppCompatActivity {
                 return;
             }
             System.out.println(CIN); /* <=== */ 
+            Amplitude.getInstance().logEvent("Registration complete", CIN);
 
             ld.startLoadingDialog();
             fbAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
