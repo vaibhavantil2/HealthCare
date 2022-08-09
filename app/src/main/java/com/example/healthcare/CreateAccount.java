@@ -166,6 +166,8 @@ public class CreateAccount extends AppCompatActivity {
                 patientBirthDate.setError("Date should match the YYYY-MM-DD format !");
                 return;
             }
+            System.out.println(CIN); /* <=== */ 
+
             ld.startLoadingDialog();
             fbAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
