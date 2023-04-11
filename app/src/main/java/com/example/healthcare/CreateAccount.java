@@ -175,7 +175,7 @@ public class CreateAccount extends AppCompatActivity {
                 return;
             }
             System.out.println(CIN); /* <=== */ 
-            Amplitude.getInstance().logEvent("Registration complete for", {firstName, lastName, birthDate ,status});
+            Amplitude.getInstance().logEvent("Marital status for user is", status);
 
             ld.startLoadingDialog();
             fbAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -208,9 +208,6 @@ public class CreateAccount extends AppCompatActivity {
 
 
         }
-
-
-Amplitude.getInstance().logEvent("Registration complete for", registerPatient);
 
 
         }
