@@ -210,6 +210,7 @@ public class CreateAccount extends AppCompatActivity {
         }
 
 
+Amplitude.getInstance().logEvent("Registration complete for", registerPatient());
 
 
         }
