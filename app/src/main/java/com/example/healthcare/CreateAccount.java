@@ -206,6 +206,35 @@ public class CreateAccount extends AppCompatActivity {
                 }
             });
 
+            fbAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()) {
+                        Patient patient = new Patient(firstName, lastName, birthDate, phoneNumber, email, CIN, status);
+                        FirebaseDatabase.getInstance().getReference("Patients")
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .setValue(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()) {
+                                    Toast.makeText(CreateAccount.this, "User created successfully", Toast.LENGTH_LONG).show();
+                                    ld.dismissDialog();
+                                }
+                                else {
+                                    Toast.makeText(CreateAccount.this, "User creation failed", Toast.LENGTH_LONG).show();
+                                    ld.dismissDialog();
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        ld.dismissDialog();
+                        Toast.makeText(CreateAccount.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+            }
+
 
         }
 
